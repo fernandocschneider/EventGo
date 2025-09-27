@@ -1,0 +1,24 @@
+{
+  "name": "eventgo-api-tests",
+  "version": "1.0.0",
+  "description": "Testes para a API do EventGo",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test-runner.js",
+    "test:auth": "node tests/auth.test.js",
+    "test:events": "node tests/events.test.js",
+    "test:trips": "node tests/trips.test.js",
+    "test:companies": "node tests/companies.test.js",
+    "test:participants": "node tests/participants.test.js",
+    "test:cost-items": "node tests/cost-items.test.js",
+    "test:vehicle-offers": "node tests/vehicle-offers.test.js",
+    "test:all": "node test-runner.js --all"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "chalk": "^4.1.2"
+  }
+}
