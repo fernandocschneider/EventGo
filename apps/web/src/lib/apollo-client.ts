@@ -15,8 +15,12 @@ console.log(
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql"
 );
 
+// TEMPORARY FIX: Hardcode the Railway API URL for testing
+const API_URL = "https://api-production-1a49.up.railway.app/graphql";
+console.log("🚀 Using hardcoded API URL:", API_URL);
+
 const httpLink = createHttpLink({
-  uri: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql",
+  uri: API_URL,
 });
 
 const authLink = setContext((_, { headers }) => {
