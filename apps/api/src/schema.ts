@@ -30,6 +30,7 @@ export const typeDefs = `#graphql
     email: String!
     avatarUrl: String
     role: Role!
+    profilePublicInfo: String
     createdAt: DateTime!
     organizedTrips: [Trip!]!
     participations: [Participant!]!
@@ -82,7 +83,6 @@ export const typeDefs = `#graphql
   type Participant {
     id: ID!
     joinedAt: DateTime!
-    profilePublicInfo: String
     user: User!
     trip: Trip!
   }
@@ -90,13 +90,8 @@ export const typeDefs = `#graphql
   type CostItem {
     id: ID!
     label: String!
-    description: String
-    amount: Decimal!
     totalAmount: Decimal!
     perPersonShare: Decimal!
-    category: CostCategory
-    isPaid: Boolean!
-    paidBy: User
     createdAt: DateTime!
     trip: Trip!
     creator: User!
@@ -144,11 +139,7 @@ export const typeDefs = `#graphql
   input CreateCostItemInput {
     tripId: ID!
     label: String!
-    description: String
-    amount: Decimal!
     totalAmount: Decimal!
-    category: CostCategory
-    isPaid: Boolean = false
   }
 
   input CreateEventInput {
@@ -178,6 +169,13 @@ export const typeDefs = `#graphql
     name: String!
     description: String
     contactEmail: String!
+  }
+
+  input UpdateProfileInput {
+    name: String
+    email: String
+    avatarUrl: String
+    profilePublicInfo: String
   }
 
   input EventsFilter {
@@ -216,6 +214,7 @@ export const typeDefs = `#graphql
     # Autenticação
     signup(input: SignupInput!): AuthPayload!
     login(email: String!, password: String!): AuthPayload!
+    updateProfile(input: UpdateProfileInput!): User!
 
     # Empresas
     createCompany(input: CreateCompanyInput!): Company!

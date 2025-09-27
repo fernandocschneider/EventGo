@@ -1,23 +1,30 @@
-'use client';
+"use client";
 
-import { useMutation, useQuery, gql } from '@apollo/client';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  ArrowLeft,
-  Calendar,
-  MapPin,
-  Car,
-  Plus
-} from 'lucide-react';
-import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
+import { useMutation, useQuery, gql } from "@apollo/client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, Calendar, MapPin, Car, Plus } from "lucide-react";
+import Link from "next/link";
+import { useAuth } from "@/hooks/use-auth";
+import { convertDateTimeLocalToISO } from "@/lib/utils";
 
 const GET_EVENTS = gql`
   query GetEvents($limit: Int) {
@@ -48,15 +55,15 @@ export default function CreateTripPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
-    title: '',
-    eventId: '',
-    originCity: '',
-    destinationCity: '',
-    date: ''
+    title: "",
+    eventId: "",
+    originCity: "",
+    destinationCity: "",
+    date: "",
   });
 
   const { data: eventsData, loading: eventsLoading } = useQuery(GET_EVENTS, {
-    variables: { limit: 50 }
+    variables: { limit: 50 },
   });
 
   const [createTrip, { loading: creating }] = useMutation(CREATE_TRIP, {
@@ -64,15 +71,15 @@ export default function CreateTripPage() {
       router.push(`/trips/${data.createTrip.id}`);
     },
     onError: (error) => {
-      console.error('Erro ao criar viagem:', error);
-    }
+      console.error("Erro ao criar viagem:", error);
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
@@ -81,19 +88,19 @@ export default function CreateTripPage() {
         variables: {
           input: {
             ...formData,
-            date: new Date(formData.date).toISOString()
-          }
-        }
+            date: convertDateTimeLocalToISO(formData.date),
+          },
+        },
       });
     } catch (error) {
-      console.error('Erro ao criar viagem:', error);
+      console.error("Erro ao criar viagem:", error);
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -166,7 +173,7 @@ export default function CreateTripPage() {
                   type="text"
                   placeholder="Ex: Galera de SP pro Rock in Rio"
                   value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
                   required
                 />
               </div>
@@ -176,7 +183,7 @@ export default function CreateTripPage() {
                 <Label htmlFor="event">Evento</Label>
                 <Select
                   value={formData.eventId}
-                  onValueChange={(value) => handleInputChange('eventId', value)}
+                  onValueChange={(value) => handleInputChange("eventId", value)}
                   required
                 >
                   <SelectTrigger>
@@ -184,12 +191,17 @@ export default function CreateTripPage() {
                   </SelectTrigger>
                   <SelectContent>
                     {eventsLoading ? (
-                      <SelectItem value="" disabled>Carregando eventos...</SelectItem>
-                    ) : eventsData?.events?.map((event: any) => (
-                      <SelectItem key={event.id} value={event.id}>
-                        {event.title} - {event.city} ({new Date(event.date).toLocaleDateString('pt-BR')})
+                      <SelectItem value="loading" disabled>
+                        Carregando eventos...
                       </SelectItem>
-                    ))}
+                    ) : (
+                      eventsData?.events?.map((event: any) => (
+                        <SelectItem key={event.id} value={event.id}>
+                          {event.title} - {event.city} (
+                          {new Date(event.date).toLocaleDateString("pt-BR")})
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -204,7 +216,9 @@ export default function CreateTripPage() {
                     type="text"
                     placeholder="Ex: São Paulo"
                     value={formData.originCity}
-                    onChange={(e) => handleInputChange('originCity', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("originCity", e.target.value)
+                    }
                     className="pl-10"
                     required
                   />
@@ -221,7 +235,9 @@ export default function CreateTripPage() {
                     type="text"
                     placeholder="Ex: Rio de Janeiro"
                     value={formData.destinationCity}
-                    onChange={(e) => handleInputChange('destinationCity', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("destinationCity", e.target.value)
+                    }
                     className="pl-10"
                     required
                   />
@@ -237,7 +253,7 @@ export default function CreateTripPage() {
                     id="date"
                     type="datetime-local"
                     value={formData.date}
-                    onChange={(e) => handleInputChange('date', e.target.value)}
+                    onChange={(e) => handleInputChange("date", e.target.value)}
                     className="pl-10"
                     required
                   />
@@ -246,12 +262,8 @@ export default function CreateTripPage() {
 
               {/* Submit Button */}
               <div className="flex gap-4 pt-6">
-                <Button
-                  type="submit"
-                  disabled={creating}
-                  className="flex-1"
-                >
-                  {creating ? 'Criando...' : 'Criar Viagem'}
+                <Button type="submit" disabled={creating} className="flex-1">
+                  {creating ? "Criando..." : "Criar Viagem"}
                 </Button>
                 <Link href="/trips">
                   <Button type="button" variant="outline">
@@ -273,9 +285,17 @@ export default function CreateTripPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3 text-sm text-gray-600">
-              <p>• Após criar a viagem, você receberá um código único para compartilhar</p>
-              <p>• Pessoas podem participar da viagem usando o código ou link</p>
-              <p>• Você pode adicionar custos (gasolina, hospedagem, etc.) que serão divididos automaticamente</p>
+              <p>
+                • Após criar a viagem, você receberá um código único para
+                compartilhar
+              </p>
+              <p>
+                • Pessoas podem participar da viagem usando o código ou link
+              </p>
+              <p>
+                • Você pode adicionar custos (gasolina, hospedagem, etc.) que
+                serão divididos automaticamente
+              </p>
               <p>• Empresas podem oferecer veículos para sua viagem</p>
             </div>
           </CardContent>

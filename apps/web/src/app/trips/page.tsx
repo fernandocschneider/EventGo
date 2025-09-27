@@ -136,10 +136,7 @@ export default function TripsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {data?.trips?.map((trip: any) => (
-              <Card
-                key={trip.id}
-                className="hover:shadow-lg transition-shadow duration-200"
-              >
+              <Card key={trip.id} className="card-transition hover:shadow-xl">
                 <Link href={`/trips/${trip.id}`}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start mb-3">

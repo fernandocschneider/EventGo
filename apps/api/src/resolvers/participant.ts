@@ -14,7 +14,7 @@ export const participantResolvers = {
           where: { code }
         });
 
-        if (!tripByCode || tripByCode.id !== tripId) {
+        if (!tripByCode || tripByCode.id !== parseInt(tripId)) {
           throw new GraphQLError('Código de viagem inválido');
         }
       }
@@ -23,8 +23,8 @@ export const participantResolvers = {
       const existingParticipant = await prisma.participant.findUnique({
         where: {
           userId_tripId: {
-            userId: user.id,
-            tripId
+            userId: parseInt(user.id),
+            tripId: parseInt(tripId)
           }
         }
       });
@@ -36,9 +36,8 @@ export const participantResolvers = {
       // Adicionar participante
       return await prisma.participant.create({
         data: {
-          userId: user.id,
-          tripId,
-          profilePublicInfo: null
+          userId: parseInt(user.id),
+          tripId: parseInt(tripId)
         },
         include: {
           user: true,

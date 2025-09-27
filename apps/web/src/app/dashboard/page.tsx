@@ -3,6 +3,7 @@
 import { useQuery, gql } from "@apollo/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +28,6 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
 
 const GET_ME = gql`
   query GetMe {
@@ -84,7 +84,7 @@ const GET_ME = gql`
 `;
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const { data, loading, error } = useQuery(GET_ME, {
@@ -92,13 +92,23 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [user, router, authLoading]);
 
-  if (!user) {
-    return null;
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded mb-4 w-1/3"></div>
+            <div className="h-4 bg-gray-200 rounded mb-2 w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (loading) {

@@ -80,7 +80,7 @@ export const eventResolvers = {
           throw new GraphQLError("Empresa não encontrada");
         }
 
-        if (company.ownerId !== user.id) {
+        if (company.ownerId !== parseInt(user.id)) {
           throw new GraphQLError(
             "Você só pode criar eventos para suas próprias empresas"
           );
@@ -116,7 +116,7 @@ export const eventResolvers = {
         throw new GraphQLError("Evento não encontrado");
       }
 
-      if (event.organizerCompany?.ownerId !== user.id) {
+      if (event.organizerCompany?.ownerId !== parseInt(user.id)) {
         throw new GraphQLError("Apenas o organizador pode editar o evento");
       }
 
@@ -127,7 +127,7 @@ export const eventResolvers = {
           description: input.description,
           city: input.city,
           venue: input.venue,
-          date: input.date
+          date: input.date,
         },
         include: {
           organizerCompany: true,
@@ -149,7 +149,7 @@ export const eventResolvers = {
         throw new GraphQLError("Evento não encontrado");
       }
 
-      if (event.organizerCompany?.ownerId !== user.id) {
+      if (event.organizerCompany?.ownerId !== parseInt(user.id)) {
         throw new GraphQLError("Apenas o organizador pode deletar o evento");
       }
 

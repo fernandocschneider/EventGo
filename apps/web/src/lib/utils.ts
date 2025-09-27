@@ -33,6 +33,24 @@ export function formatDateTime(date: string | Date): string {
   }).format(dateObj);
 }
 
+export function convertDateTimeLocalToISO(dateTimeLocal: string): string {
+  // O input datetime-local retorna no formato "YYYY-MM-DDTHH:MM"
+  // Precisamos adicionar os segundos e timezone para ISO
+  if (!dateTimeLocal) return "";
+  
+  // Se já tem segundos, usar como está
+  if (dateTimeLocal.includes(":").length >= 2) {
+    return new Date(dateTimeLocal).toISOString();
+  }
+  
+  // Adicionar segundos se não tiver
+  const dateTimeWithSeconds = dateTimeLocal.includes(":") 
+    ? `${dateTimeLocal}:00` 
+    : dateTimeLocal;
+    
+  return new Date(dateTimeWithSeconds).toISOString();
+}
+
 export function shareTrip(
   tripId: string,
   tripCode: string,

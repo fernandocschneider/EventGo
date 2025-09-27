@@ -81,6 +81,22 @@ export const authResolvers = {
         token,
         user
       };
+    },
+
+    updateProfile: async (_: any, { input }: any, { prisma, user }: Context) => {
+      if (!user) {
+        throw new GraphQLError('Usuário deve estar logado');
+      }
+
+      return await prisma.user.update({
+        where: { id: parseInt(user.id) },
+        data: {
+          name: input.name,
+          email: input.email,
+          avatarUrl: input.avatarUrl,
+          profilePublicInfo: input.profilePublicInfo,
+        }
+      });
     }
   }
 };

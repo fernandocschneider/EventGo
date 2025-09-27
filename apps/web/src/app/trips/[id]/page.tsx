@@ -57,11 +57,11 @@ const GET_TRIP = gql`
       participants {
         id
         joinedAt
-        profilePublicInfo
         user {
           id
           name
           avatarUrl
+          profilePublicInfo
         }
       }
       costItems {
@@ -319,6 +319,33 @@ export default function TripDetailPage() {
           </div>
         </div>
 
+        {/* Cost Management Button (for organizer) */}
+        {isOrganizer && (
+          <div className="mb-8">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">
+                      Gerenciar Custos da Viagem
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Adicione custos como gasolina, hospedagem e ingressos para
+                      dividir entre os participantes
+                    </p>
+                  </div>
+                  <Link href={`/trips/${trip.id}/costs`}>
+                    <Button>
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Gerenciar Custos
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Event Info */}
         <div className="mb-8">
           <Card>
@@ -374,9 +401,9 @@ export default function TripDetailPage() {
                     <p className="font-medium text-gray-900">
                       {participant.user.name}
                     </p>
-                    {participant.profilePublicInfo && (
+                    {participant.user.profilePublicInfo && (
                       <p className="text-sm text-gray-500">
-                        {participant.profilePublicInfo}
+                        {participant.user.profilePublicInfo}
                       </p>
                     )}
                   </div>
@@ -425,9 +452,11 @@ export default function TripDetailPage() {
                   </div>
                   <p className="text-sm text-gray-500 text-right">
                     R${" "}
-                    {(Number(trip.totalCosts) / trip.totalParticipants).toFixed(
-                      2
-                    )}{" "}
+                    {trip.totalParticipants > 0
+                      ? (
+                          Number(trip.totalCosts) / trip.totalParticipants
+                        ).toFixed(2)
+                      : Number(trip.totalCosts).toFixed(2)}{" "}
                     por pessoa
                   </p>
                 </div>

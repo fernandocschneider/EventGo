@@ -53,7 +53,7 @@ export const costItemResolvers = {
       return await prisma.costItem.create({
         data: {
           label: input.label,
-          totalAmount: input.totalAmount,
+          totalAmount: Number(input.totalAmount),
           tripId: parseInt(input.tripId),
           createdBy: parseInt(user.id),
         },
@@ -93,7 +93,7 @@ export const costItemResolvers = {
         where: { id: parseInt(id) },
         data: {
           label: input.label,
-          totalAmount: input.totalAmount,
+          totalAmount: Number(input.totalAmount),
         },
         include: {
           trip: true,
@@ -144,23 +144,12 @@ export const costItemResolvers = {
       });
     },
 
-    paidBy: async (parent: any, _: any, { prisma }: Context) => {
-      if (!parent.paidById) return null;
-      return await prisma.user.findUnique({
-        where: { id: parent.paidById },
-      });
-    },
-
-    amount: async (parent: any, _: any, { prisma }: Context) => {
-      return parent.amount || parent.totalAmount;
-    },
-
     perPersonShare: async (parent: any, _: any, { prisma }: Context) => {
       const participantCount = await prisma.participant.count({
         where: { tripId: parent.tripId },
       });
 
-      if (participantCount === 0) return new Decimal(0);
+      if (participantCount === 0) return new Decimal(parent.totalAmount);
 
       return new Decimal(parent.totalAmount).dividedBy(participantCount);
     },

@@ -15,7 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar, MapPin, Users, Search, Plus, Filter } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 const GET_EVENTS = gql`
   query GetEvents($limit: Int, $filter: EventsFilter) {
@@ -40,8 +41,16 @@ const GET_EVENTS = gql`
 
 export default function EventsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("");
+
+  useEffect(() => {
+    const searchParam = searchParams.get("search");
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams]);
 
   const { data, loading, error } = useQuery(GET_EVENTS, {
     variables: {
@@ -124,10 +133,7 @@ export default function EventsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data?.events?.map((event: any) => (
-              <Card
-                key={event.id}
-                className="hover:shadow-lg transition-shadow duration-200"
-              >
+              <Card key={event.id} className="card-transition hover:shadow-xl">
                 <Link href={`/events/${event.id}`}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start mb-3">

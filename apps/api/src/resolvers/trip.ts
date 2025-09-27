@@ -53,7 +53,7 @@ export const tripResolvers = {
 
     trip: async (_: any, { id }: any, { prisma }: Context) => {
       return await prisma.trip.findUnique({
-        where: { id },
+        where: { id: parseInt(id) },
         include: {
           event: true,
           organizer: true,
@@ -119,7 +119,6 @@ export const tripResolvers = {
         data: {
           userId: parseInt(user.id),
           tripId: trip.id,
-          profilePublicInfo: "Organizador da viagem",
         },
       });
 
