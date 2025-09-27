@@ -44,13 +44,7 @@ export const apolloClient = new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
       Event: {
-        keyFields: ["id"],
-        merge(existing, incoming) {
-          if (existing && incoming && existing.id === incoming.id) {
-            return { ...existing, ...incoming };
-          }
-          return incoming;
-        },
+        keyFields: false, // Desabilitar cache baseado em ID para evitar erros
       },
       Trip: {
         keyFields: ["id"],
