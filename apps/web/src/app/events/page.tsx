@@ -18,7 +18,7 @@ import { formatDate } from "@/lib/utils";
 import { useState } from "react";
 
 const GET_EVENTS = gql`
-  query GetEvents($limit: Int, $offset: Int, $filter: EventsFilter) {
+  query GetEvents($limit: Int, $filter: EventsFilter) {
     events(limit: $limit, filter: $filter) {
       id
       title
@@ -46,7 +46,6 @@ export default function EventsPage() {
   const { data, loading, error } = useQuery(GET_EVENTS, {
     variables: {
       limit: 20,
-      offset: 0,
       filter: {
         search: searchQuery || undefined,
         city: cityFilter || undefined,

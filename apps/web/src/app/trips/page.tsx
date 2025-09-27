@@ -27,7 +27,7 @@ import { formatDate } from "@/lib/utils";
 import { useState } from "react";
 
 const GET_TRIPS = gql`
-  query GetTrips($limit: Int, $offset: Int, $filter: TripsFilter) {
+  query GetTrips($limit: Int, $filter: TripsFilter) {
     trips(limit: $limit, filter: $filter) {
       id
       title
@@ -58,7 +58,6 @@ export default function TripsPage() {
   const { data, loading, error } = useQuery(GET_TRIPS, {
     variables: {
       limit: 20,
-      offset: 0,
       filter: {
         search: searchQuery || undefined,
         city: cityFilter || undefined,
