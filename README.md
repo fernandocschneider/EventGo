@@ -14,6 +14,7 @@ Uma plataforma web responsiva para facilitar a organização de viagens em grupo
 ## 📋 Funcionalidades
 
 ### Para Usuários
+
 - ✅ Cadastro e login com email/senha
 - ✅ Buscar eventos e viagens
 - ✅ Criar viagens associadas a eventos
@@ -22,11 +23,13 @@ Uma plataforma web responsiva para facilitar a organização de viagens em grupo
 - ✅ Visualizar ofertas de veículos
 
 ### Para Empresas
+
 - ✅ Cadastrar eventos
 - ✅ Oferecer veículos para deslocamento
 - ✅ Gerenciar ofertas e eventos
 
 ### Para Organizadores
+
 - ✅ Gerenciar participantes da viagem
 - ✅ Criar e editar itens de custo
 - ✅ Compartilhar viagem via link/código
@@ -35,6 +38,7 @@ Uma plataforma web responsiva para facilitar a organização de viagens em grupo
 ## 🛠️ Instalação e Execução
 
 ### Pré-requisitos
+
 - Node.js 18+
 - PostgreSQL
 - Docker (opcional)
@@ -42,18 +46,21 @@ Uma plataforma web responsiva para facilitar a organização de viagens em grupo
 ### Opção 1: Execução Local (sem Docker)
 
 1. **Clone o repositório**
+
 ```bash
 git clone <repo-url>
 cd group-travel-platform
 ```
 
 2. **Configure as variáveis de ambiente**
+
 ```bash
 cp .env.example .env
 # Edite o arquivo .env com suas configurações
 ```
 
 3. **Instale as dependências**
+
 ```bash
 npm install
 cd apps/api && npm install
@@ -62,8 +69,12 @@ cd ../..
 ```
 
 4. **Configure o banco de dados**
+
 ```bash
-# Execute as migrations
+# Copie o arquivo de ambiente
+cp .env.example .env
+
+# Execute as migrations (cria as tabelas)
 npm run prisma:migrate
 # Gere o cliente Prisma
 npm run prisma:generate
@@ -72,6 +83,7 @@ npm run seed
 ```
 
 5. **Execute o projeto**
+
 ```bash
 # Modo desenvolvimento
 npm run dev
@@ -87,6 +99,7 @@ npm run dev:web
 ### Opção 2: Execução com Docker
 
 1. **Clone e configure**
+
 ```bash
 git clone <repo-url>
 cd group-travel-platform
@@ -94,6 +107,7 @@ cp .env.example .env
 ```
 
 2. **Execute com Docker Compose**
+
 ```bash
 # Build e execução
 docker-compose up --build
@@ -103,6 +117,7 @@ docker-compose up -d --build
 ```
 
 3. **Acesse a aplicação**
+
 - Frontend: http://localhost:3000
 - Backend/GraphQL Playground: http://localhost:4000/graphql
 
@@ -134,6 +149,7 @@ cd apps/api && npx prisma migrate reset
 ## 📊 GraphQL API
 
 ### Endpoint
+
 - **Development**: http://localhost:4000/graphql
 - **Production**: [URL de produção]/graphql
 
@@ -241,6 +257,7 @@ cd apps/web && npx playwright test
 ## 🌱 Dados de Exemplo (Seed)
 
 O comando `npm run seed` cria:
+
 - 3 usuários de exemplo
 - 2 empresas
 - 4 eventos
@@ -250,11 +267,13 @@ O comando `npm run seed` cria:
 ### Credenciais de Teste
 
 **Usuários:**
+
 - Email: `user1@example.com` | Senha: `password123`
 - Email: `user2@example.com` | Senha: `password123`
 - Email: `user3@example.com` | Senha: `password123`
 
 **Empresas:**
+
 - Email: `company1@example.com` | Senha: `password123`
 - Email: `company2@example.com` | Senha: `password123`
 
@@ -297,6 +316,7 @@ npm run prisma:studio     # Interface visual do banco
 ## 📱 Funcionalidades Implementadas
 
 ### ✅ MVP Concluído
+
 - [x] Sistema de autenticação JWT
 - [x] CRUD completo para todos os modelos
 - [x] Interface responsiva mobile-first
@@ -307,6 +327,7 @@ npm run prisma:studio     # Interface visual do banco
 - [x] Containerização Docker
 
 ### 🔄 Próximas Funcionalidades
+
 - [ ] Sistema de notificações em tempo real
 - [ ] Chat entre participantes
 - [ ] Integração com mapas para rotas
@@ -329,6 +350,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 ## 📞 Suporte
 
 Para dúvidas ou suporte, entre em contato:
+
 - Email: suporte@grouptravel.com
 - Issues: [GitHub Issues](link-para-issues)
 
