@@ -8,6 +8,21 @@ export const typeDefs = `#graphql
     ORGANIZER
   }
 
+  enum CostCategory {
+    TRANSPORT
+    ACCOMMODATION
+    FOOD
+    ACTIVITIES
+    OTHER
+  }
+
+  enum VehicleType {
+    CAR
+    VAN
+    BUS
+    MINIBUS
+  }
+
 
   type User {
     id: ID!
@@ -47,9 +62,12 @@ export const typeDefs = `#graphql
   type Trip {
     id: ID!
     title: String!
+    description: String
     originCity: String!
     destinationCity: String!
     date: DateTime!
+    maxParticipants: Int
+    pricePerPerson: Decimal
     code: String!
     createdAt: DateTime!
     event: Event!
@@ -72,8 +90,13 @@ export const typeDefs = `#graphql
   type CostItem {
     id: ID!
     label: String!
+    description: String
+    amount: Decimal!
     totalAmount: Decimal!
     perPersonShare: Decimal!
+    category: CostCategory
+    isPaid: Boolean!
+    paidBy: User
     createdAt: DateTime!
     trip: Trip!
     creator: User!
@@ -81,11 +104,15 @@ export const typeDefs = `#graphql
 
   type VehicleOffer {
     id: ID!
+    vehicleType: VehicleType!
     capacity: Int!
     pricePerPerson: Decimal
     pickupLocation: String!
     pickupTime: DateTime!
+    description: String
     notes: String
+    contactInfo: String
+    isAvailable: Boolean!
     createdAt: DateTime!
     company: Company!
     trip: Trip
@@ -105,16 +132,23 @@ export const typeDefs = `#graphql
 
   input CreateTripInput {
     title: String!
+    description: String
     eventId: ID!
     originCity: String!
     destinationCity: String!
     date: DateTime!
+    maxParticipants: Int
+    pricePerPerson: Decimal
   }
 
   input CreateCostItemInput {
     tripId: ID!
     label: String!
+    description: String
+    amount: Decimal!
     totalAmount: Decimal!
+    category: CostCategory
+    isPaid: Boolean = false
   }
 
   input CreateEventInput {
@@ -123,15 +157,21 @@ export const typeDefs = `#graphql
     city: String!
     venue: String!
     date: DateTime!
+    organizerCompanyId: ID
   }
 
   input CreateVehicleOfferInput {
+    tripId: ID
+    companyId: ID!
+    vehicleType: VehicleType!
     capacity: Int!
     pricePerPerson: Decimal
     pickupLocation: String!
     pickupTime: DateTime!
+    description: String
     notes: String
-    tripId: ID
+    contactInfo: String!
+    isAvailable: Boolean = true
   }
 
   input CreateCompanyInput {
@@ -179,10 +219,13 @@ export const typeDefs = `#graphql
 
     # Empresas
     createCompany(input: CreateCompanyInput!): Company!
+    updateCompany(id: ID!, input: CreateCompanyInput!): Company!
+    deleteCompany(id: ID!): Boolean!
 
     # Eventos
     createEvent(input: CreateEventInput!): Event!
     updateEvent(id: ID!, input: CreateEventInput!): Event!
+    deleteEvent(id: ID!): Boolean!
 
     # Viagens
     createTrip(input: CreateTripInput!): Trip!

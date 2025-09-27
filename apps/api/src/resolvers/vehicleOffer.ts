@@ -30,19 +30,35 @@ export const vehicleOfferResolvers = {
         throw new GraphQLError("Usuário deve estar logado");
       }
 
-      // Verificar se o usuário tem uma empresa
-      const company = await prisma.company.findFirst({
-        where: { ownerId: user.id }
-      });
+      // Verificar se a empresa existe e se o usuário tem permissão
+      if (input.companyId) {
+        const company = await prisma.company.findUnique({
+          where: { id: input.companyId }
+        });
 
-      if (!company) {
-        throw new GraphQLError("Apenas empresas podem criar ofertas de veículos");
+        if (!company) {
+          throw new GraphQLError("Empresa não encontrada");
+        }
+
+        if (company.ownerId !== user.id) {
+          throw new GraphQLError("Você só pode criar ofertas para suas próprias empresas");
+        }
+      } else {
+        // Buscar empresa do usuário se não especificada
+        const company = await prisma.company.findFirst({
+          where: { ownerId: user.id }
+        });
+
+        if (!company) {
+          throw new GraphQLError("Apenas empresas podem criar ofertas de veículos");
+        }
+
+        input.companyId = company.id;
       }
 
       return await prisma.vehicleOffer.create({
         data: {
-          ...input,
-          companyId: company.id
+          ...input
         },
         include: {
           company: true,

@@ -1,6 +1,6 @@
-import { Context } from '../context';
-import { GraphQLError } from 'graphql';
-import { nanoid } from 'nanoid';
+import { Context } from "../context";
+import { GraphQLError } from "graphql";
+import { nanoid } from "nanoid";
 
 export const tripResolvers = {
   Query: {
@@ -9,13 +9,13 @@ export const tripResolvers = {
 
       if (filter) {
         if (filter.eventId) {
-          where.eventId = filter.eventId;
+          where.eventId = parseInt(filter.eventId);
         }
 
         if (filter.city) {
           where.OR = [
-            { originCity: { contains: filter.city, mode: 'insensitive' } },
-            { destinationCity: { contains: filter.city, mode: 'insensitive' } }
+            { originCity: { contains: filter.city, mode: "insensitive" } },
+            { destinationCity: { contains: filter.city, mode: "insensitive" } },
           ];
         }
 
@@ -28,7 +28,7 @@ export const tripResolvers = {
         if (filter.search) {
           where.title = {
             contains: filter.search,
-            mode: 'insensitive'
+            mode: "insensitive",
           };
         }
       }
@@ -40,14 +40,14 @@ export const tripResolvers = {
           event: true,
           organizer: true,
           participants: {
-            include: { user: true }
+            include: { user: true },
           },
           costItems: true,
           vehicleOffers: {
-            include: { company: true }
-          }
+            include: { company: true },
+          },
         },
-        orderBy: { date: 'asc' }
+        orderBy: { date: "asc" },
       });
     },
 
@@ -58,15 +58,15 @@ export const tripResolvers = {
           event: true,
           organizer: true,
           participants: {
-            include: { user: true }
+            include: { user: true },
           },
           costItems: {
-            include: { creator: true }
+            include: { creator: true },
           },
           vehicleOffers: {
-            include: { company: true }
-          }
-        }
+            include: { company: true },
+          },
+        },
       });
     },
 
@@ -77,120 +77,134 @@ export const tripResolvers = {
           event: true,
           organizer: true,
           participants: {
-            include: { user: true }
+            include: { user: true },
           },
           costItems: {
-            include: { creator: true }
+            include: { creator: true },
           },
           vehicleOffers: {
-            include: { company: true }
-          }
-        }
+            include: { company: true },
+          },
+        },
       });
-    }
+    },
   },
 
   Mutation: {
     createTrip: async (_: any, { input }: any, { prisma, user }: Context) => {
       if (!user) {
-        throw new GraphQLError('Usuário deve estar logado');
+        throw new GraphQLError("Usuário deve estar logado");
       }
 
       const code = nanoid(8).toUpperCase();
 
       const trip = await prisma.trip.create({
         data: {
-          ...input,
+          title: input.title,
+          eventId: parseInt(input.eventId),
+          originCity: input.originCity,
+          destinationCity: input.destinationCity,
+          date: input.date,
           code,
-          organizerId: user.id
+          organizerId: parseInt(user.id),
         },
         include: {
           event: true,
-          organizer: true
-        }
+          organizer: true,
+        },
       });
 
       // Adicionar o organizador como primeiro participante
       await prisma.participant.create({
         data: {
-          userId: user.id,
+          userId: parseInt(user.id),
           tripId: trip.id,
-          profilePublicInfo: 'Organizador da viagem'
-        }
+          profilePublicInfo: "Organizador da viagem",
+        },
       });
 
       return trip;
     },
 
-    updateTrip: async (_: any, { id, input }: any, { prisma, user }: Context) => {
+    updateTrip: async (
+      _: any,
+      { id, input }: any,
+      { prisma, user }: Context
+    ) => {
       if (!user) {
-        throw new GraphQLError('Usuário deve estar logado');
+        throw new GraphQLError("Usuário deve estar logado");
       }
 
       const trip = await prisma.trip.findUnique({
-        where: { id }
+        where: { id: parseInt(id) },
       });
 
       if (!trip) {
-        throw new GraphQLError('Viagem não encontrada');
+        throw new GraphQLError("Viagem não encontrada");
       }
 
-      if (trip.organizerId !== user.id) {
-        throw new GraphQLError('Apenas o organizador pode editar a viagem');
+      if (trip.organizerId !== parseInt(user.id)) {
+        throw new GraphQLError("Apenas o organizador pode editar a viagem");
       }
 
       return await prisma.trip.update({
-        where: { id },
-        data: input,
+        where: { id: parseInt(id) },
+        data: {
+          title: input.title,
+          eventId: parseInt(input.eventId),
+          originCity: input.originCity,
+          destinationCity: input.destinationCity,
+          date: input.date,
+        },
         include: {
           event: true,
           organizer: true,
-          participants: { include: { user: true } }
-        }
+          participants: { include: { user: true } },
+        },
       });
     },
 
     deleteTrip: async (_: any, { id }: any, { prisma, user }: Context) => {
       if (!user) {
-        throw new GraphQLError('Usuário deve estar logado');
+        throw new GraphQLError("Usuário deve estar logado");
       }
 
       const trip = await prisma.trip.findUnique({
-        where: { id }
+        where: { id: parseInt(id) },
       });
 
       if (!trip) {
-        throw new GraphQLError('Viagem não encontrada');
+        throw new GraphQLError("Viagem não encontrada");
       }
 
-      if (trip.organizerId !== user.id) {
-        throw new GraphQLError('Apenas o organizador pode deletar a viagem');
+      if (trip.organizerId !== parseInt(user.id)) {
+        throw new GraphQLError("Apenas o organizador pode deletar a viagem");
       }
 
       // Deletar registros relacionados primeiro
-      await prisma.participant.deleteMany({ where: { tripId: id } });
-      await prisma.costItem.deleteMany({ where: { tripId: id } });
+      await prisma.participant.deleteMany({ where: { tripId: parseInt(id) } });
+      await prisma.costItem.deleteMany({ where: { tripId: parseInt(id) } });
       await prisma.vehicleOffer.updateMany({
-        where: { tripId: id },
-        data: { tripId: null }
+        where: { tripId: parseInt(id) },
+        data: { tripId: null },
       });
 
-      await prisma.trip.delete({ where: { id } });
+      await prisma.trip.delete({ where: { id: parseInt(id) } });
 
       return true;
-    }
+    },
   },
 
   Trip: {
     event: async (parent: any, _: any, { prisma }: Context) => {
       return await prisma.event.findUnique({
-        where: { id: parent.eventId }
+        where: { id: parent.eventId },
       });
     },
 
     organizer: async (parent: any, _: any, { prisma }: Context) => {
       return await prisma.user.findUnique({
-        where: { id: parent.organizerId }
+        where: { id: parent.organizerId },
       });
     },
 
@@ -198,7 +212,7 @@ export const tripResolvers = {
       return await prisma.participant.findMany({
         where: { tripId: parent.id },
         include: { user: true },
-        orderBy: { joinedAt: 'asc' }
+        orderBy: { joinedAt: "asc" },
       });
     },
 
@@ -206,29 +220,29 @@ export const tripResolvers = {
       return await prisma.costItem.findMany({
         where: { tripId: parent.id },
         include: { creator: true },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: "desc" },
       });
     },
 
     vehicleOffers: async (parent: any, _: any, { prisma }: Context) => {
       return await prisma.vehicleOffer.findMany({
         where: { tripId: parent.id },
-        include: { company: true }
+        include: { company: true },
       });
     },
 
     totalParticipants: async (parent: any, _: any, { prisma }: Context) => {
       return await prisma.participant.count({
-        where: { tripId: parent.id }
+        where: { tripId: parent.id },
       });
     },
 
     totalCosts: async (parent: any, _: any, { prisma }: Context) => {
       const costs = await prisma.costItem.findMany({
-        where: { tripId: parent.id }
+        where: { tripId: parent.id },
       });
 
       return costs.reduce((total, cost) => total + Number(cost.totalAmount), 0);
-    }
-  }
+    },
+  },
 };
