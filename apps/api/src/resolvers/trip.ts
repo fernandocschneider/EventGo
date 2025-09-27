@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 
 export const tripResolvers = {
   Query: {
-    trips: async (_: any, { filter, limit, offset }: any, { prisma }: Context) => {
+    trips: async (_: any, { filter, limit }: any, { prisma }: Context) => {
       const where: any = {};
 
       if (filter) {
@@ -36,7 +36,6 @@ export const tripResolvers = {
       return await prisma.trip.findMany({
         where,
         take: limit,
-        skip: offset,
         include: {
           event: true,
           organizer: true,

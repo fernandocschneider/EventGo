@@ -3,7 +3,7 @@ import { GraphQLError } from 'graphql';
 
 export const eventResolvers = {
   Query: {
-    events: async (_: any, { filter, limit, offset }: any, { prisma }: Context) => {
+    events: async (_: any, { filter, limit }: any, { prisma }: Context) => {
       const where: any = {};
 
       if (filter) {
@@ -32,7 +32,6 @@ export const eventResolvers = {
       return await prisma.event.findMany({
         where,
         take: limit,
-        skip: offset,
         include: {
           organizerCompany: true,
           trips: {

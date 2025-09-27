@@ -1,20 +1,26 @@
-'use client';
+"use client";
 
-import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { onError } from '@apollo/client/link/error';
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+  from,
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { onError } from "@apollo/client/link/error";
 
 const httpLink = createHttpLink({
-  uri: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/graphql',
+  uri: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql",
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+      authorization: token ? `Bearer ${token}` : "",
     },
   };
 });
@@ -35,13 +41,34 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 export const apolloClient = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Event: {
+        keyFields: ["id"],
+        merge(existing, incoming) {
+          if (existing && incoming && existing.id === incoming.id) {
+            return { ...existing, ...incoming };
+          }
+          return incoming;
+        },
+      },
+      Trip: {
+        keyFields: ["id"],
+        merge(existing, incoming) {
+          if (existing && incoming && existing.id === incoming.id) {
+            return { ...existing, ...incoming };
+          }
+          return incoming;
+        },
+      },
+    },
+  }),
   defaultOptions: {
     watchQuery: {
-      errorPolicy: 'all',
+      errorPolicy: "all",
     },
     query: {
-      errorPolicy: 'all',
+      errorPolicy: "all",
     },
   },
 });

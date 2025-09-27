@@ -157,9 +157,9 @@ export const typeDefs = `#graphql
 
   type Query {
     me: User
-    events(filter: EventsFilter, limit: Int = 20, offset: Int = 0): [Event!]!
+    events(filter: EventsFilter, limit: Int = 20): [Event!]!
     event(id: ID!): Event
-    trips(filter: TripsFilter, limit: Int = 20, offset: Int = 0): [Trip!]!
+    trips(filter: TripsFilter, limit: Int = 20): [Trip!]!
     trip(id: ID!): Trip
     tripByCode(code: String!): Trip
     companies(limit: Int = 20, offset: Int = 0): [Company!]!
