@@ -115,7 +115,7 @@ model CostItem {
 }
 
 model VehicleOffer {
-  id             String    @id @default(cuid())
+  id             Int       @id @default(autoincrement())
   capacity       Int
   pricePerPerson Float?
   pickupLocation String
@@ -124,9 +124,9 @@ model VehicleOffer {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  companyId String
+  companyId Int
   company   Company @relation(fields: [companyId], references: [id])
-  tripId    String?
+  tripId    Int?
   trip      Trip?   @relation(fields: [tripId], references: [id])
 
   @@map("vehicle_offers")

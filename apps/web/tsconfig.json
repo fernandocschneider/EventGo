@@ -8,6 +8,8 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noEmit": true,
     "incremental": true,
     "module": "esnext",

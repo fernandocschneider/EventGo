@@ -139,7 +139,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="flex items-center space-x-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                className="flex items-center space-x-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <item.icon className="h-5 w-5" />
@@ -150,7 +150,7 @@ export function Header() {
             {isAuthenticated && (
               <Link
                 href="/trips/create"
-                className="flex items-center space-x-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                className="flex items-center space-x-3 text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-2 rounded-md text-base font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Plus className="h-5 w-5" />

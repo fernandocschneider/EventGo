@@ -8,9 +8,6 @@ export const typeDefs = `#graphql
     ORGANIZER
   }
 
-  enum SplitMethod {
-    EQUAL
-  }
 
   type User {
     id: ID!
@@ -76,7 +73,6 @@ export const typeDefs = `#graphql
     id: ID!
     label: String!
     totalAmount: Decimal!
-    splitMethod: SplitMethod!
     perPersonShare: Decimal!
     createdAt: DateTime!
     trip: Trip!
