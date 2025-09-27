@@ -22,11 +22,12 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Always call useQuery, but handle the token check inside
-  const { data, loading, error, refetch } = useQuery(ME_QUERY, {
+  // Only call useQuery when we have a token and are initialized
+  const { data, loading, error } = useQuery(ME_QUERY, {
     skip: !token || !isInitialized,
     errorPolicy: "all",
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
@@ -42,10 +43,6 @@ export function useAuth() {
       localStorage.setItem("token", newToken);
     }
     setToken(newToken);
-    // Forçar reload para garantir que o estado seja atualizado
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
   };
 
   const logout = () => {
@@ -58,8 +55,8 @@ export function useAuth() {
 
   return {
     user: data?.me,
-    isAuthenticated: !!token && !!data?.me,
-    isLoading: loading,
+    isAuthenticated: !!token && !!data?.me && !loading,
+    isLoading: loading || !isInitialized,
     error,
     login,
     logout,

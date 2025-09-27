@@ -84,20 +84,21 @@ const GET_ME = gql`
 `;
 
 export default function DashboardPage() {
-  const { user, logout, isLoading: authLoading } = useAuth();
+  const { user, logout, isLoading: authLoading, isAuthenticated } = useAuth();
   const router = useRouter();
 
   const { data, loading, error } = useQuery(GET_ME, {
-    skip: !user,
+    skip: !isAuthenticated,
   });
 
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !isAuthenticated) {
       router.push("/login");
     }
-  }, [user, router, authLoading]);
+  }, [isAuthenticated, router, authLoading]);
 
-  if (authLoading || !user) {
+  // Show loading state while checking authentication
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -109,6 +110,11 @@ export default function DashboardPage() {
         </div>
       </div>
     );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return null; // Will redirect via useEffect
   }
 
   if (loading) {
