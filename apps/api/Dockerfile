@@ -21,7 +21,8 @@ RUN npx prisma generate
 # Build da aplicação
 RUN npm run build
 
-# Remover devDependencies após o build
+# Limpar cache e remover devDependencies após o build
+RUN npm cache clean --force
 RUN npm prune --production
 
 EXPOSE 4000
