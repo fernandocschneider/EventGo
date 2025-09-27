@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useMutation, gql } from '@apollo/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
-import { Car, Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useMutation, gql } from "@apollo/client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/use-auth";
+import { Car, Eye, EyeOff } from "lucide-react";
 
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
@@ -29,42 +35,42 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const [loginMutation, { loading }] = useMutation(LOGIN, {
-    onCompleted: (data) => {
-      login(data.login.token);
-      router.push('/dashboard');
+    onCompleted: async (data) => {
+      await login(data.login.token);
+      router.push("/dashboard");
     },
     onError: (error) => {
-      setError('Email ou senha incorretos');
-    }
+      setError("Email ou senha incorretos");
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
+    setError("");
+
     try {
       await loginMutation({
         variables: {
           email: formData.email,
-          password: formData.password
-        }
+          password: formData.password,
+        },
       });
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error("Erro no login:", error);
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -107,7 +113,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="seu@email.com"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                   required
                 />
               </div>
@@ -117,10 +123,12 @@ export default function LoginPage() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     placeholder="Sua senha"
                     value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("password", e.target.value)
+                    }
                     required
                   />
                   <button
@@ -128,24 +136,27 @@ export default function LoginPage() {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading}
-              >
-                {loading ? 'Entrando...' : 'Entrar'}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Não tem uma conta?{' '}
-                <Link href="/signup" className="text-blue-600 hover:text-blue-500 font-medium">
+                Não tem uma conta?{" "}
+                <Link
+                  href="/signup"
+                  className="text-blue-600 hover:text-blue-500 font-medium"
+                >
                   Criar conta
                 </Link>
               </p>
@@ -156,12 +167,18 @@ export default function LoginPage() {
         {/* Demo Credentials */}
         <Card className="bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-900 text-sm">Credenciais de Teste</CardTitle>
+            <CardTitle className="text-blue-900 text-sm">
+              Credenciais de Teste
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm text-blue-800">
-              <p><strong>Usuário:</strong> user1@example.com / password123</p>
-              <p><strong>Empresa:</strong> company1@example.com / password123</p>
+              <p>
+                <strong>Usuário:</strong> user1@example.com / password123
+              </p>
+              <p>
+                <strong>Empresa:</strong> company1@example.com / password123
+              </p>
             </div>
           </CardContent>
         </Card>

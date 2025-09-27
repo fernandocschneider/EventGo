@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import {
   Calendar,
   MapPin,
@@ -120,23 +122,56 @@ export default function TripDetailPage() {
   const { data, loading, error } = useQuery(GET_TRIP, {
     variables: { id: tripId },
     skip: !tripId,
+    errorPolicy: "all",
+  });
+
+  // Debug logs
+  console.log("🔍 Trip Debug:", {
+    tripId,
+    loading,
+    error,
+    data: data?.trip,
   });
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded mb-4 w-1/3"></div>
-            <div className="h-4 bg-gray-200 rounded mb-2 w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-500">Carregando viagem...</p>
+            <p className="mt-2 text-sm text-gray-400">ID: {tripId}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  if (error || !data?.trip) {
+  if (error) {
+    console.error("🚨 Trip Query Error:", error);
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Erro ao carregar viagem
+            </h1>
+            <p className="text-gray-500 mb-6">
+              Ocorreu um erro ao carregar os dados da viagem. Tente novamente.
+            </p>
+            <Link href="/trips">
+              <Button>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar para Viagens
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!loading && !data?.trip) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,15 +200,62 @@ export default function TripDetailPage() {
     (p: any) => p.user.id === user?.id
   );
 
+  const { toast } = useToast();
+
+  const [joinTripMutation, { loading: joiningTrip }] = useMutation(JOIN_TRIP, {
+    onCompleted: () => {
+      toast({
+        title: "Sucesso!",
+        description: "Você foi adicionado à viagem com sucesso!",
+      });
+      setShowJoinForm(false);
+      setJoinCode("");
+      // Refetch da query para atualizar a lista de participantes
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao participar da viagem",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleJoinTrip = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!joinCode.trim()) {
+      toast({
+        title: "Código obrigatório",
+        description: "Por favor, insira o código da viagem",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await joinTripMutation({
+      variables: {
+        tripId,
+        code: joinCode.trim(),
+      },
+    });
+  };
+
   const copyTripCode = () => {
     navigator.clipboard.writeText(trip.code);
-    // Aqui você poderia mostrar um toast de sucesso
+    toast({
+      title: "Código copiado!",
+      description: `Código ${trip.code} copiado para a área de transferência.`,
+    });
   };
 
   const copyTripLink = () => {
     const link = `${origin}/trips/${trip.id}`;
     navigator.clipboard.writeText(link);
-    // Aqui você poderia mostrar um toast de sucesso
+    toast({
+      title: "Link copiado!",
+      description: "Link da viagem copiado para a área de transferência.",
+    });
   };
 
   return (
@@ -516,6 +598,54 @@ export default function TripDetailPage() {
                 </Card>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Join Trip Modal */}
+        {showJoinForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-md mx-4">
+              <CardHeader>
+                <CardTitle>Participar da Viagem</CardTitle>
+                <CardDescription>
+                  Insira o código da viagem para participar
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleJoinTrip} className="space-y-4">
+                  <div>
+                    <Label htmlFor="joinCode">Código da Viagem</Label>
+                    <Input
+                      id="joinCode"
+                      value={joinCode}
+                      onChange={(e) => setJoinCode(e.target.value)}
+                      placeholder="Digite o código da viagem"
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowJoinForm(false);
+                        setJoinCode("");
+                      }}
+                      className="flex-1"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={joiningTrip}
+                      className="flex-1"
+                    >
+                      {joiningTrip ? "Participando..." : "Participar"}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>

@@ -21,10 +21,13 @@ export function useAuth() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  
-  const { data, loading, error } = useQuery(ME_QUERY, {
-    skip: !token,
+
+  // Sempre executar o useQuery, mas com skip baseado no token
+  const { data, loading, error, refetch } = useQuery(ME_QUERY, {
+    skip: !token || !isInitialized,
     errorPolicy: "all",
+    fetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
@@ -35,11 +38,15 @@ export function useAuth() {
     }
   }, []);
 
-  const login = (newToken: string) => {
+  const login = async (newToken: string) => {
     if (typeof window !== "undefined") {
       localStorage.setItem("token", newToken);
     }
     setToken(newToken);
+    // Forçar reload para garantir que o estado seja atualizado
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   };
 
   const logout = () => {
@@ -50,22 +57,19 @@ export function useAuth() {
     router.push("/");
   };
 
-  // Não redirecionar se ainda não inicializou
-  if (!isInitialized) {
-    return {
-      user: null,
-      isAuthenticated: false,
-      isLoading: true,
-      error: null,
-      login,
-      logout,
-    };
-  }
+  // Debug logs
+  console.log("🔍 Auth Debug:", {
+    token: !!token,
+    user: data?.me,
+    loading,
+    error,
+    isAuthenticated: !!token && !error,
+  });
 
   return {
     user: data?.me,
-    isAuthenticated: !!token && !!data?.me && !error,
-    isLoading: loading,
+    isAuthenticated: !!token && !error,
+    isLoading: loading || !isInitialized,
     error,
     login,
     logout,

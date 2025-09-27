@@ -9,18 +9,31 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 
-// Debug: Log the API URL being used
-console.log(
-  "🔍 API URL:",
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql"
-);
+// Get API URL from environment variables or detect production
+const getApiUrl = () => {
+  // If NEXT_PUBLIC_API_URL is set, use it
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
 
-// TEMPORARY FIX: Hardcode the Railway API URL for testing
-const API_URL = "https://api-production-1a49.up.railway.app/graphql";
-console.log("🚀 Using hardcoded API URL:", API_URL);
+  // If we're in production (Railway), use the production API URL
+  if (process.env.NODE_ENV === "production") {
+    return "https://api-production-1a49.up.railway.app/graphql";
+  }
+
+  // Default to localhost for development
+  return "http://localhost:4000/graphql";
+};
+
+const API_URL = getApiUrl();
+
+// Debug: Log the API URL being used
+console.log("🔍 API URL:", API_URL);
+console.log("🔍 NODE_ENV:", process.env.NODE_ENV);
 
 const httpLink = createHttpLink({
   uri: API_URL,
+  credentials: 'include',
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -70,9 +83,11 @@ export const apolloClient = new ApolloClient({
   defaultOptions: {
     watchQuery: {
       errorPolicy: "all",
+      fetchPolicy: "cache-first",
     },
     query: {
       errorPolicy: "all",
+      fetchPolicy: "cache-first",
     },
   },
 });

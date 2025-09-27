@@ -52,8 +52,8 @@ export default function SignupPage() {
   const [error, setError] = useState("");
 
   const [signupMutation, { loading }] = useMutation(SIGNUP, {
-    onCompleted: (data) => {
-      login(data.signup.token);
+    onCompleted: async (data) => {
+      await login(data.signup.token);
       router.push("/dashboard");
     },
     onError: (error) => {
