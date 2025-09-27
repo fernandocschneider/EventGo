@@ -125,3 +125,14 @@ dist
 # Temporary folders
 tmp/
 temp/
+
+# Webpack cache files
+*.pack.gz
+*.pack
+*.cache
+*.tz
+
+# Next.js cache
+.next/cache/
+.next/server/
+.next/static/

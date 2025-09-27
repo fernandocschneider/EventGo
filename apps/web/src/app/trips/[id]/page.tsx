@@ -1,16 +1,23 @@
-'use client';
+"use client";
 
-import { useQuery, gql } from '@apollo/client';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Calendar, 
-  MapPin, 
-  Users, 
+import { useQuery, gql } from "@apollo/client";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import {
+  Calendar,
+  MapPin,
+  Users,
   Car,
   Plus,
   ArrowLeft,
@@ -18,11 +25,11 @@ import {
   DollarSign,
   Share2,
   Copy,
-  UserPlus
-} from 'lucide-react';
-import { formatDate } from '@/lib/utils';
-import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
+  UserPlus,
+} from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 const GET_TRIP = gql`
   query GetTrip($id: ID!) {
@@ -101,11 +108,18 @@ export default function TripDetailPage() {
   const tripId = params.id;
   const { user, isAuthenticated } = useAuth();
   const [showJoinForm, setShowJoinForm] = useState(false);
-  const [joinCode, setJoinCode] = useState('');
+  const [joinCode, setJoinCode] = useState("");
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   const { data, loading, error } = useQuery(GET_TRIP, {
     variables: { id: tripId },
-    skip: !tripId
+    skip: !tripId,
   });
 
   if (loading) {
@@ -147,7 +161,9 @@ export default function TripDetailPage() {
 
   const trip = data.trip;
   const isOrganizer = user?.id === trip.organizer.id;
-  const isParticipant = trip.participants.some((p: any) => p.user.id === user?.id);
+  const isParticipant = trip.participants.some(
+    (p: any) => p.user.id === user?.id
+  );
 
   const copyTripCode = () => {
     navigator.clipboard.writeText(trip.code);
@@ -155,7 +171,7 @@ export default function TripDetailPage() {
   };
 
   const copyTripLink = () => {
-    const link = `${window.location.origin}/trips/${trip.id}`;
+    const link = `${origin}/trips/${trip.id}`;
     navigator.clipboard.writeText(link);
     // Aqui você poderia mostrar um toast de sucesso
   };
@@ -189,7 +205,7 @@ export default function TripDetailPage() {
                   Código: {trip.code}
                 </Badge>
               </div>
-              
+
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
                 {trip.title}
               </h1>
@@ -198,11 +214,13 @@ export default function TripDetailPage() {
                 <div className="flex items-center text-gray-600">
                   <Car className="h-5 w-5 mr-3 text-gray-400" />
                   <div>
-                    <p className="font-medium">{trip.originCity} → {trip.destinationCity}</p>
+                    <p className="font-medium">
+                      {trip.originCity} → {trip.destinationCity}
+                    </p>
                     <p className="text-sm text-gray-500">Rota da viagem</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center text-gray-600">
                   <Calendar className="h-5 w-5 mr-3 text-gray-400" />
                   <div>
@@ -217,14 +235,19 @@ export default function TripDetailPage() {
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={trip.organizer.avatarUrl} />
                     <AvatarFallback>
-                      {trip.organizer.name.split(' ').map(n => n[0]).join('')}
+                      {trip.organizer.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium text-gray-900">
                       Organizado por {trip.organizer.name}
                     </p>
-                    <p className="text-sm text-gray-500">Organizador da viagem</p>
+                    <p className="text-sm text-gray-500">
+                      Organizador da viagem
+                    </p>
                   </div>
                 </div>
               </div>
@@ -243,7 +266,9 @@ export default function TripDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Código da viagem</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Código da viagem
+                    </label>
                     <div className="flex gap-2 mt-1">
                       <Input value={trip.code} readOnly className="font-mono" />
                       <Button size="sm" onClick={copyTripCode}>
@@ -251,13 +276,15 @@ export default function TripDetailPage() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Link da viagem</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Link da viagem
+                    </label>
                     <div className="flex gap-2 mt-1">
-                      <Input 
-                        value={`${window.location.origin}/trips/${trip.id}`} 
-                        readOnly 
+                      <Input
+                        value={`${origin}/trips/${trip.id}`}
+                        readOnly
                         className="text-xs"
                       />
                       <Button size="sm" onClick={copyTripLink}>
@@ -278,7 +305,7 @@ export default function TripDetailPage() {
                       Você já está participando
                     </Button>
                   ) : (
-                    <Button 
+                    <Button
                       className="w-full"
                       onClick={() => setShowJoinForm(true)}
                     >
@@ -304,7 +331,9 @@ export default function TripDetailPage() {
             <CardContent>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-gray-900">{trip.event.title}</h3>
+                  <h3 className="font-medium text-gray-900">
+                    {trip.event.title}
+                  </h3>
                   <p className="text-sm text-gray-500">
                     {trip.event.venue} • {trip.event.city}
                   </p>
@@ -313,9 +342,7 @@ export default function TripDetailPage() {
                   </p>
                 </div>
                 <Link href={`/events/${trip.event.id}`}>
-                  <Button variant="outline">
-                    Ver Evento
-                  </Button>
+                  <Button variant="outline">Ver Evento</Button>
                 </Link>
               </div>
             </CardContent>
@@ -330,17 +357,27 @@ export default function TripDetailPage() {
             </h2>
             <div className="space-y-3">
               {trip.participants.map((participant: any) => (
-                <div key={participant.id} className="flex items-center gap-3 p-3 bg-white rounded-lg">
+                <div
+                  key={participant.id}
+                  className="flex items-center gap-3 p-3 bg-white rounded-lg"
+                >
                   <Avatar>
                     <AvatarImage src={participant.user.avatarUrl} />
                     <AvatarFallback>
-                      {participant.user.name.split(' ').map(n => n[0]).join('')}
+                      {participant.user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">{participant.user.name}</p>
+                    <p className="font-medium text-gray-900">
+                      {participant.user.name}
+                    </p>
                     {participant.profilePublicInfo && (
-                      <p className="text-sm text-gray-500">{participant.profilePublicInfo}</p>
+                      <p className="text-sm text-gray-500">
+                        {participant.profilePublicInfo}
+                      </p>
                     )}
                   </div>
                   <Badge variant="outline" className="text-xs">
@@ -361,7 +398,9 @@ export default function TripDetailPage() {
                 {trip.costItems.map((cost: any) => (
                   <div key={cost.id} className="p-4 bg-white rounded-lg">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-gray-900">{cost.label}</h4>
+                      <h4 className="font-medium text-gray-900">
+                        {cost.label}
+                      </h4>
                       <div className="text-right">
                         <p className="font-bold text-gray-900">
                           R$ {Number(cost.totalAmount).toFixed(2)}
@@ -372,7 +411,8 @@ export default function TripDetailPage() {
                       </div>
                     </div>
                     <p className="text-sm text-gray-500">
-                      Criado por {cost.creator.name} • {formatDate(cost.createdAt)}
+                      Criado por {cost.creator.name} •{" "}
+                      {formatDate(cost.createdAt)}
                     </p>
                   </div>
                 ))}
@@ -384,7 +424,11 @@ export default function TripDetailPage() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 text-right">
-                    R$ {(Number(trip.totalCosts) / trip.totalParticipants).toFixed(2)} por pessoa
+                    R${" "}
+                    {(Number(trip.totalCosts) / trip.totalParticipants).toFixed(
+                      2
+                    )}{" "}
+                    por pessoa
                   </p>
                 </div>
               </div>
@@ -408,10 +452,10 @@ export default function TripDetailPage() {
                 <Card key={offer.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{offer.company.name}</CardTitle>
-                      <Badge variant="outline">
-                        {offer.capacity} lugares
-                      </Badge>
+                      <CardTitle className="text-lg">
+                        {offer.company.name}
+                      </CardTitle>
+                      <Badge variant="outline">{offer.capacity} lugares</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -427,11 +471,16 @@ export default function TripDetailPage() {
                       {offer.pricePerPerson && (
                         <div className="flex items-center text-sm text-gray-600">
                           <DollarSign className="h-4 w-4 mr-2" />
-                          <span>R$ {Number(offer.pricePerPerson).toFixed(2)} por pessoa</span>
+                          <span>
+                            R$ {Number(offer.pricePerPerson).toFixed(2)} por
+                            pessoa
+                          </span>
                         </div>
                       )}
                       {offer.notes && (
-                        <p className="text-sm text-gray-500 mt-2">{offer.notes}</p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          {offer.notes}
+                        </p>
                       )}
                     </div>
                   </CardContent>

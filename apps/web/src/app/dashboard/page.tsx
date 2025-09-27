@@ -2,6 +2,7 @@
 
 import { useQuery, gql } from "@apollo/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,7 +27,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const GET_ME = gql`
   query GetMe {
@@ -90,8 +91,13 @@ export default function DashboardPage() {
     skip: !user,
   });
 
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    }
+  }, [user, router]);
+
   if (!user) {
-    router.push("/login");
     return null;
   }
 
@@ -115,7 +121,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <p className="text-gray-500">Erro ao carregar dados</p>
-            <Button onClick={() => window.location.reload()} className="mt-4">
+            <Button onClick={() => router.refresh()} className="mt-4">
               Tentar novamente
             </Button>
           </div>

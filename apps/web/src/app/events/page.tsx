@@ -2,6 +2,7 @@
 
 import { useQuery, gql } from "@apollo/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,6 +39,7 @@ const GET_EVENTS = gql`
 `;
 
 export default function EventsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [cityFilter, setCityFilter] = useState("");
 
@@ -116,7 +118,7 @@ export default function EventsPage() {
         ) : error ? (
           <div className="text-center py-12">
             <p className="text-gray-500">Erro ao carregar eventos</p>
-            <Button onClick={() => window.location.reload()} className="mt-4">
+            <Button onClick={() => router.refresh()} className="mt-4">
               Tentar novamente
             </Button>
           </div>

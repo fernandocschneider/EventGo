@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useQuery } from '@apollo/client';
-import { gql } from '@apollo/client';
+import { useState, useEffect } from "react";
+import { useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useRouter } from "next/navigation";
 
 const ME_QUERY = gql`
   query Me {
@@ -17,27 +18,32 @@ const ME_QUERY = gql`
 `;
 
 export function useAuth() {
+  const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const { data, loading, error } = useQuery(ME_QUERY, {
     skip: !token,
   });
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('token');
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
       setToken(storedToken);
     }
   }, []);
 
   const login = (newToken: string) => {
-    localStorage.setItem('token', newToken);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", newToken);
+    }
     setToken(newToken);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+    }
     setToken(null);
-    window.location.href = '/';
+    router.push("/");
   };
 
   return {

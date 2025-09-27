@@ -1,23 +1,30 @@
-'use client';
+"use client";
 
-import { useQuery, gql } from '@apollo/client';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { 
-  Calendar, 
-  MapPin, 
-  Users, 
+import { useQuery, gql } from "@apollo/client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Calendar,
+  MapPin,
+  Users,
   Car,
   Search,
   Plus,
   Filter,
-  Clock
-} from 'lucide-react';
-import { formatDate } from '@/lib/utils';
-import { useState } from 'react';
+  Clock,
+} from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { useState } from "react";
 
 const GET_TRIPS = gql`
   query GetTrips($limit: Int, $offset: Int, $filter: TripsFilter) {
@@ -44,8 +51,9 @@ const GET_TRIPS = gql`
 `;
 
 export default function TripsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [cityFilter, setCityFilter] = useState('');
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
 
   const { data, loading, error } = useQuery(GET_TRIPS, {
     variables: {
@@ -53,9 +61,9 @@ export default function TripsPage() {
       offset: 0,
       filter: {
         search: searchQuery || undefined,
-        city: cityFilter || undefined
-      }
-    }
+        city: cityFilter || undefined,
+      },
+    },
   });
 
   return (
@@ -109,7 +117,10 @@ export default function TripsPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
+              <div
+                key={i}
+                className="bg-white rounded-xl p-6 shadow-sm animate-pulse"
+              >
                 <div className="h-4 bg-gray-200 rounded mb-4"></div>
                 <div className="h-3 bg-gray-200 rounded mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded w-3/4"></div>
@@ -119,17 +130,17 @@ export default function TripsPage() {
         ) : error ? (
           <div className="text-center py-12">
             <p className="text-gray-500">Erro ao carregar viagens</p>
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4"
-            >
+            <Button onClick={() => router.refresh()} className="mt-4">
               Tentar novamente
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {data?.trips?.map((trip: any) => (
-              <Card key={trip.id} className="hover:shadow-lg transition-shadow duration-200">
+              <Card
+                key={trip.id}
+                className="hover:shadow-lg transition-shadow duration-200"
+              >
                 <Link href={`/trips/${trip.id}`}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start mb-3">
@@ -152,7 +163,9 @@ export default function TripsPage() {
                     <div className="space-y-3">
                       <div className="flex items-center text-sm text-gray-600">
                         <Car className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>{trip.originCity} → {trip.destinationCity}</span>
+                        <span>
+                          {trip.originCity} → {trip.destinationCity}
+                        </span>
                       </div>
                       <div className="flex items-center text-sm text-gray-600">
                         <Calendar className="h-4 w-4 mr-2 text-gray-400" />
@@ -186,10 +199,9 @@ export default function TripsPage() {
               Nenhuma viagem encontrada
             </h3>
             <p className="text-gray-500 mb-6">
-              {searchQuery || cityFilter 
-                ? 'Tente ajustar os filtros de busca'
-                : 'Seja o primeiro a organizar uma viagem!'
-              }
+              {searchQuery || cityFilter
+                ? "Tente ajustar os filtros de busca"
+                : "Seja o primeiro a organizar uma viagem!"}
             </p>
             <Link href="/trips/create">
               <Button>
