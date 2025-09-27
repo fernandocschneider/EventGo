@@ -22,12 +22,11 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Sempre executar o useQuery, mas com skip baseado no token
+  // Always call useQuery, but handle the token check inside
   const { data, loading, error, refetch } = useQuery(ME_QUERY, {
     skip: !token || !isInitialized,
     errorPolicy: "all",
     fetchPolicy: "cache-first",
-    notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
@@ -57,19 +56,10 @@ export function useAuth() {
     router.push("/");
   };
 
-  // Debug logs
-  console.log("🔍 Auth Debug:", {
-    token: !!token,
-    user: data?.me,
-    loading,
-    error,
-    isAuthenticated: !!token && !error,
-  });
-
   return {
     user: data?.me,
-    isAuthenticated: !!token && !error,
-    isLoading: loading || !isInitialized,
+    isAuthenticated: !!token && !!data?.me,
+    isLoading: loading,
     error,
     login,
     logout,

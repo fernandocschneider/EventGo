@@ -27,13 +27,11 @@ const getApiUrl = () => {
 
 const API_URL = getApiUrl();
 
-// Debug: Log the API URL being used
-console.log("🔍 API URL:", API_URL);
-console.log("🔍 NODE_ENV:", process.env.NODE_ENV);
+// API URL configuration
 
 const httpLink = createHttpLink({
   uri: API_URL,
-  credentials: 'include',
+  credentials: "include",
 });
 
 const authLink = setContext((_, { headers }) => {

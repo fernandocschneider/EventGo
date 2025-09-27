@@ -122,86 +122,10 @@ export default function TripDetailPage() {
   const { data, loading, error } = useQuery(GET_TRIP, {
     variables: { id: tripId },
     skip: !tripId,
-    errorPolicy: "all",
   });
 
-  // Debug logs
-  console.log("🔍 Trip Debug:", {
-    tripId,
-    loading,
-    error,
-    data: data?.trip,
-  });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-500">Carregando viagem...</p>
-            <p className="mt-2 text-sm text-gray-400">ID: {tripId}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    console.error("🚨 Trip Query Error:", error);
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Erro ao carregar viagem
-            </h1>
-            <p className="text-gray-500 mb-6">
-              Ocorreu um erro ao carregar os dados da viagem. Tente novamente.
-            </p>
-            <Link href="/trips">
-              <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para Viagens
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!loading && !data?.trip) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Viagem não encontrada
-            </h1>
-            <p className="text-gray-500 mb-6">
-              A viagem que você está procurando não existe ou foi removida.
-            </p>
-            <Link href="/trips">
-              <Button>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar para Viagens
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const trip = data.trip;
-  const isOrganizer = user?.id === trip.organizer.id;
-  const isParticipant = trip.participants.some(
-    (p: any) => p.user.id === user?.id
-  );
-
+  // ✅ MOVENDO TODOS OS HOOKS PARA O TOPO
   const { toast } = useToast();
-
   const [joinTripMutation, { loading: joiningTrip }] = useMutation(JOIN_TRIP, {
     onCompleted: () => {
       toast({
@@ -210,7 +134,6 @@ export default function TripDetailPage() {
       });
       setShowJoinForm(false);
       setJoinCode("");
-      // Refetch da query para atualizar a lista de participantes
       window.location.reload();
     },
     onError: (error) => {
@@ -240,6 +163,49 @@ export default function TripDetailPage() {
       },
     });
   };
+
+  // Early returns APÓS todos os hooks
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-500">Carregando viagem...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data?.trip) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Viagem não encontrada
+            </h1>
+            <p className="text-gray-500 mb-6">
+              A viagem que você está procurando não existe ou foi removida.
+            </p>
+            <Link href="/trips">
+              <Button>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar para Viagens
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const trip = data.trip;
+  const isOrganizer = user?.id === trip.organizer.id;
+  const isParticipant = trip.participants.some(
+    (p: any) => p.user.id === user?.id
+  );
 
   const copyTripCode = () => {
     navigator.clipboard.writeText(trip.code);
