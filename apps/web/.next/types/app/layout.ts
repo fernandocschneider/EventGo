@@ -1,4 +1,4 @@
-// File: C:\Users\jeant\OneDrive\Documentos\Projects\boltz.test\apps\web\src\app\layout.tsx
+// File: C:\Users\jeant\OneDrive\Documentos\Projects\EventGo\apps\web\src\app\layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
