@@ -9,6 +9,12 @@ import {
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 
+// Debug: Log the API URL being used
+console.log(
+  "🔍 API URL:",
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql"
+);
+
 const httpLink = createHttpLink({
   uri: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql",
 });

@@ -1,13 +1,14 @@
-import { Inter } from 'next/font/google';
-import { ApolloProviderWrapper } from '@/components/providers/apollo-provider';
-import { Header } from '@/components/layout/header';
-import './globals.css';
+import { Inter } from "next/font/google";
+import { ApolloProviderWrapper } from "@/components/providers/apollo-provider";
+import { Header } from "@/components/layout/header";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: 'GroupTravel - Organize viagens em grupo',
-  description: 'Plataforma para organizar viagens em grupo para eventos, festivais e shows.',
+  title: "EventGO - Organize viagens em grupo",
+  description:
+    "Plataforma para organizar viagens em grupo para eventos, festivais e shows.",
 };
 
 export default function RootLayout({

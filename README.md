@@ -1,4 +1,4 @@
-# GroupTravel - Plataforma de Viagens em Grupo
+# EventGO - Plataforma de Viagens em Grupo
 
 Plataforma web para organização de viagens em grupo para eventos, com divisão automática de custos e ofertas de veículos.
 

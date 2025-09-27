@@ -37,9 +37,7 @@ export function Header() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Car className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-xl text-gray-900">
-                GroupTravel
-              </span>
+              <span className="font-bold text-xl text-gray-900">EventGO</span>
             </Link>
           </div>
 

@@ -68,9 +68,12 @@ model Event {
 model Trip {
   id              Int      @id @default(autoincrement())
   title           String
+  description     String?
   originCity      String
   destinationCity String
   date            DateTime
+  maxParticipants Int?
+  pricePerPerson  Float?
   code            String   @unique
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -116,11 +119,15 @@ model CostItem {
 
 model VehicleOffer {
   id             Int       @id @default(autoincrement())
+  vehicleType    String    @default("CAR")
   capacity       Int
   pricePerPerson Float?
   pickupLocation String
   pickupTime     DateTime
+  description    String?
   notes          String?
+  contactInfo    String
+  isAvailable    Boolean   @default(true)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
