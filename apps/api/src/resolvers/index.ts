@@ -11,8 +11,8 @@ import { vehicleOfferResolvers } from "./vehicleOffer";
 
 // Custom Decimal scalar resolver
 const DecimalResolver = new GraphQLScalarType({
-  name: 'Decimal',
-  description: 'A decimal number',
+  name: "Decimal",
+  description: "A decimal number",
   serialize(value) {
     return value?.toString();
   },
@@ -20,7 +20,11 @@ const DecimalResolver = new GraphQLScalarType({
     return value?.toString();
   },
   parseLiteral(ast) {
-    if (ast.kind === Kind.STRING || ast.kind === Kind.INT || ast.kind === Kind.FLOAT) {
+    if (
+      ast.kind === Kind.STRING ||
+      ast.kind === Kind.INT ||
+      ast.kind === Kind.FLOAT
+    ) {
       return ast.value;
     }
     return null;
@@ -30,14 +34,13 @@ const DecimalResolver = new GraphQLScalarType({
 export const resolvers = {
   DateTime: DateTimeResolver,
   Decimal: DecimalResolver,
-  
+
   Query: {
     ...authResolvers.Query,
     ...userResolvers.Query,
     ...companyResolvers.Query,
     ...eventResolvers.Query,
     ...tripResolvers.Query,
-    ...participantResolvers.Query,
     ...costItemResolvers.Query,
     ...vehicleOfferResolvers.Query,
   },

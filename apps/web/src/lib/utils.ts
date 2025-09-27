@@ -38,8 +38,9 @@ export function convertDateTimeLocalToISO(dateTimeLocal: string): string {
   // Precisamos adicionar os segundos e timezone para ISO
   if (!dateTimeLocal) return "";
   
-  // Se já tem segundos, usar como está
-  if (dateTimeLocal.includes(":").length >= 2) {
+  // Se já tem segundos, usar como está (verifica se tem 3 partes separadas por :)
+  const timeParts = dateTimeLocal.split("T")[1]?.split(":") || [];
+  if (timeParts.length >= 3) {
     return new Date(dateTimeLocal).toISOString();
   }
   

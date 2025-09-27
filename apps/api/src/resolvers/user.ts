@@ -1,4 +1,4 @@
-import { Context } from '../context';
+import { Context } from "../context";
 
 export const userResolvers = {
   Query: {
@@ -6,18 +6,18 @@ export const userResolvers = {
       if (!user) return [];
 
       return await prisma.trip.findMany({
-        where: { organizerId: user.id },
+        where: { organizerId: parseInt(user.id) },
         include: {
           event: true,
           participants: {
-            include: { user: true }
+            include: { user: true },
           },
           costItems: true,
           vehicleOffers: {
-            include: { company: true }
-          }
+            include: { company: true },
+          },
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: "desc" },
       });
     },
 
@@ -25,19 +25,19 @@ export const userResolvers = {
       if (!user) return [];
 
       return await prisma.participant.findMany({
-        where: { userId: user.id },
+        where: { userId: parseInt(user.id) },
         include: {
           user: true,
           trip: {
             include: {
               event: true,
-              organizer: true
-            }
-          }
+              organizer: true,
+            },
+          },
         },
-        orderBy: { joinedAt: 'desc' }
+        orderBy: { joinedAt: "desc" },
       });
-    }
+    },
   },
 
   User: {
@@ -46,8 +46,8 @@ export const userResolvers = {
         where: { organizerId: parent.id },
         include: {
           event: true,
-          participants: { include: { user: true } }
-        }
+          participants: { include: { user: true } },
+        },
       });
     },
 
@@ -56,16 +56,16 @@ export const userResolvers = {
         where: { userId: parent.id },
         include: {
           trip: {
-            include: { event: true }
-          }
-        }
+            include: { event: true },
+          },
+        },
       });
     },
 
     ownedCompanies: async (parent: any, _: any, { prisma }: Context) => {
       return await prisma.company.findMany({
-        where: { ownerId: parent.id }
+        where: { ownerId: parent.id },
       });
-    }
-  }
+    },
+  },
 };

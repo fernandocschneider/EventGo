@@ -9,7 +9,7 @@ export const authResolvers = {
       if (!user) return null;
       
       return await prisma.user.findUnique({
-        where: { id: user.id }
+        where: { id: parseInt(user.id) }
       });
     }
   },

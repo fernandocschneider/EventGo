@@ -8,8 +8,8 @@ export const vehicleOfferResolvers = {
         where: tripId ? { tripId } : {},
         include: {
           company: true,
-          trip: true
-        }
+          trip: true,
+        },
       });
     },
 
@@ -18,14 +18,18 @@ export const vehicleOfferResolvers = {
         where: { id },
         include: {
           company: true,
-          trip: true
-        }
+          trip: true,
+        },
       });
-    }
+    },
   },
 
   Mutation: {
-    createVehicleOffer: async (_: any, { input }: any, { prisma, user }: Context) => {
+    createVehicleOffer: async (
+      _: any,
+      { input }: any,
+      { prisma, user }: Context
+    ) => {
       if (!user) {
         throw new GraphQLError("Usuário deve estar logado");
       }
@@ -33,24 +37,28 @@ export const vehicleOfferResolvers = {
       // Verificar se a empresa existe e se o usuário tem permissão
       if (input.companyId) {
         const company = await prisma.company.findUnique({
-          where: { id: input.companyId }
+          where: { id: input.companyId },
         });
 
         if (!company) {
           throw new GraphQLError("Empresa não encontrada");
         }
 
-        if (company.ownerId !== user.id) {
-          throw new GraphQLError("Você só pode criar ofertas para suas próprias empresas");
+        if (company.ownerId !== parseInt(user.id)) {
+          throw new GraphQLError(
+            "Você só pode criar ofertas para suas próprias empresas"
+          );
         }
       } else {
         // Buscar empresa do usuário se não especificada
         const company = await prisma.company.findFirst({
-          where: { ownerId: user.id }
+          where: { ownerId: parseInt(user.id) },
         });
 
         if (!company) {
-          throw new GraphQLError("Apenas empresas podem criar ofertas de veículos");
+          throw new GraphQLError(
+            "Apenas empresas podem criar ofertas de veículos"
+          );
         }
 
         input.companyId = company.id;
@@ -58,31 +66,37 @@ export const vehicleOfferResolvers = {
 
       return await prisma.vehicleOffer.create({
         data: {
-          ...input
+          ...input,
         },
         include: {
           company: true,
-          trip: true
-        }
+          trip: true,
+        },
       });
     },
 
-    updateVehicleOffer: async (_: any, { id, input }: any, { prisma, user }: Context) => {
+    updateVehicleOffer: async (
+      _: any,
+      { id, input }: any,
+      { prisma, user }: Context
+    ) => {
       if (!user) {
         throw new GraphQLError("Usuário deve estar logado");
       }
 
       const vehicleOffer = await prisma.vehicleOffer.findUnique({
         where: { id },
-        include: { company: true }
+        include: { company: true },
       });
 
       if (!vehicleOffer) {
         throw new GraphQLError("Oferta de veículo não encontrada");
       }
 
-      if (vehicleOffer.company.ownerId !== user.id) {
-        throw new GraphQLError("Apenas o proprietário da empresa pode editar a oferta");
+      if (vehicleOffer.company.ownerId !== parseInt(user.id)) {
+        throw new GraphQLError(
+          "Apenas o proprietário da empresa pode editar a oferta"
+        );
       }
 
       return await prisma.vehicleOffer.update({
@@ -90,55 +104,61 @@ export const vehicleOfferResolvers = {
         data: input,
         include: {
           company: true,
-          trip: true
-        }
+          trip: true,
+        },
       });
     },
 
-    deleteVehicleOffer: async (_: any, { id }: any, { prisma, user }: Context) => {
+    deleteVehicleOffer: async (
+      _: any,
+      { id }: any,
+      { prisma, user }: Context
+    ) => {
       if (!user) {
         throw new GraphQLError("Usuário deve estar logado");
       }
 
       const vehicleOffer = await prisma.vehicleOffer.findUnique({
         where: { id },
-        include: { company: true }
+        include: { company: true },
       });
 
       if (!vehicleOffer) {
         throw new GraphQLError("Oferta de veículo não encontrada");
       }
 
-      if (vehicleOffer.company.ownerId !== user.id) {
-        throw new GraphQLError("Apenas o proprietário da empresa pode deletar a oferta");
+      if (vehicleOffer.company.ownerId !== parseInt(user.id)) {
+        throw new GraphQLError(
+          "Apenas o proprietário da empresa pode deletar a oferta"
+        );
       }
 
       await prisma.vehicleOffer.delete({
-        where: { id }
+        where: { id },
       });
 
       return true;
-    }
+    },
   },
 
   VehicleOffer: {
     company: async (parent: any, _: any, { prisma }: Context) => {
       return await prisma.company.findUnique({
         where: { id: parent.companyId },
-        include: { owner: true }
+        include: { owner: true },
       });
     },
 
     trip: async (parent: any, _: any, { prisma }: Context) => {
       if (!parent.tripId) return null;
-      
+
       return await prisma.trip.findUnique({
         where: { id: parent.tripId },
         include: {
           event: true,
-          organizer: true
-        }
+          organizer: true,
+        },
       });
-    }
-  }
+    },
+  },
 };
