@@ -1,5 +1,11 @@
 # EventGO - Plataforma de Viagens em Grupo
 
+#Link para o vídeo: 
+##https://youtu.be/TVcp3JXXSlc
+
+#Link para o projeto online:
+##https://eventgo.up.railway.app/
+
 Plataforma web para organização de viagens em grupo para eventos, com divisão automática de custos e ofertas de veículos.
 
 ## 🚀 Tecnologias
